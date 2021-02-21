@@ -1,4 +1,6 @@
-import { Body, Controller, NotFoundException, Post } from '@nestjs/common';
+import { HttpStatus, Res, Logger } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { Response } from 'express';
 import {
   ApiAcceptedResponse,
   ApiBadRequestResponse,
@@ -8,7 +10,8 @@ import {
   ApiPayloadTooLargeResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { SendEmailDto } from './send-email.dto';
+import { EmailRequestDto } from './email-request.dto';
+import { EmailService } from './email.service';
 
 /**
  * Defines API for sending email. For the test, I've just created an API for sending emails as there is no requirement
@@ -21,7 +24,8 @@ import { SendEmailDto } from './send-email.dto';
 @ApiTags('emails')
 @Controller('emails')
 export class EmailController {
-  constructor() {
+  private readonly logger = new Logger(EmailController.name);
+  constructor(private readonly emailService: EmailService) {
     //
   }
 
@@ -44,7 +48,11 @@ export class EmailController {
   })
   @ApiInternalServerErrorResponse({ description: 'Internal server error' })
   @ApiConsumes('application/json')
-  async sendEmail(@Body() smDto: SendEmailDto): Promise<void> {
-    throw new NotFoundException();
+  async sendEmail(
+    @Body() smDto: EmailRequestDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.emailService.saveEmail(smDto);
+    res.status(HttpStatus.ACCEPTED).send();
   }
 }

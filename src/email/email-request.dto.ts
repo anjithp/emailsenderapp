@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class SendEmailDto {
+export class EmailRequestDto {
   @ApiProperty()
   @IsEmail()
   @IsNotEmpty()
@@ -15,7 +15,6 @@ export class SendEmailDto {
 
   @ApiProperty()
   @IsEmail({}, { each: true })
-  @MinLength(1)
   to: string[];
 
   @ApiProperty()
