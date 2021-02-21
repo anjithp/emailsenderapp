@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { EmailRequestDto } from './email-request.dto';
 import { Optional } from '@nestjs/common';
 import { Subscription } from '@google-cloud/pubsub';
+import { EmailSenderClient } from './sender/email-sender-client';
 
 @Injectable()
 export class EmailService {
@@ -16,6 +17,7 @@ export class EmailService {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly esClient: EmailSenderClient,
     @Optional()
     private pubsub = new ps.PubSub({ projectId: process.env.GCP_PROJECT_ID }),
   ) {
@@ -38,7 +40,7 @@ export class EmailService {
       }
     } catch (err) {
       this.logger.error(
-        `error occurred while publishing email to pubsub top ${this.configService.get(
+        `error occurred while publishing email to pubsub topic ${this.configService.get(
           'GCP_PUBSUB_TOPIC_ID',
         )}`,
       );
@@ -64,10 +66,16 @@ export class EmailService {
     }
   }
 
-  onEmailMessageReceived = (message): void => {
-    this.logger.log('Received message:', message.data.toString());
-    //acknowledge the message so it won't be redelivered
-    message.ack();
+  onEmailMessageReceived = async (message: any): Promise<void> => {
+    const erd = JSON.parse(message.data);
+    try {
+      await this.esClient.sendEmail(erd);
+      //acknowledge the message so it won't be redelivered
+      message.ack();
+    } catch (err) {
+      //just report the error and don't acknowledge the message so that it will be redeliverd again
+      this.logger.error(`error occurred while sending an email ${err}`);
+    }
   };
 
   onSubscriptionClose = (): void => {

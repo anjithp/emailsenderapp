@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { EmailModule } from './email/email.module';
 
 @Module({
@@ -13,7 +12,6 @@ import { EmailModule } from './email/email.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
 })
 /* Root module of the application */
 export class AppModule {}

@@ -1,18 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  MinLength,
-} from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class EmailRequestDto {
-  @ApiProperty()
-  @IsEmail()
-  @IsNotEmpty()
-  from: string;
-
   @ApiProperty()
   @IsEmail({}, { each: true })
   to: string[];
