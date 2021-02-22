@@ -23,6 +23,6 @@ export class EmailRequestDto {
 
   @ApiProperty()
   @IsString()
-  @IsOptional()
-  textContent?: string;
+  @IsNotEmpty()
+  textContent: string;
 }

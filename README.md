@@ -14,8 +14,8 @@ are used for implementation:
 
 Prerequisites:
 
-- Install <a href="https://nodejs.org/en/">Node.Js</a> on machine where application is being run(minimum version 12)
-- You'll also need .env file which should be placed at the root level of the application. Please contact the recruiter or email me at anjith.p@gmail.com for the file
+- Install <a href="https://nodejs.org/en/">Node.Js</a> on machine where application is being run(minimum supported version 12)
+- You'll also need .env file and credentials.json file which should be placed at the root level of the application. Please contact the recruiter or email me at anjith.p@gmail.com for the files
 
 Once the above steps are done, navigate to the root level of the application and run the below command:
 
@@ -25,11 +25,13 @@ $ npm install
 
 ## Running the app
 
-Note: Please make sure you have .env file(see above) and it is placed at the app root directory before running the below command
+Note: Please make sure you have .env and credentials.json files(see above) and they are placed at the app root directory before running the below command
 
 ```bash
 $ npm run start
 ```
+
+Once the application is up and running you can open the Swagger UI in the browser to test the API call: http://localhost:8080/api/. If port 8080 is already taken by some other process on your machine, then you can change PORT property in .env file and restart the server(for example change port to 3000): Swagger UI URL needs to be changed accordingly.
 
 ## Test
 
