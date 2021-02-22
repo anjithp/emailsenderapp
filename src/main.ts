@@ -1,8 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
+import * as bodyParser from 'body-parser';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { AppModule } from './app.module';
+import { ConfigService } from '@nestjs/config';
 
 //bootstrap the application
 async function bootstrap() {
@@ -10,6 +13,10 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.useGlobalFilters(new AllExceptionsFilter());
+  app.use(
+    '/emails',
+    bodyParser.json({ limit: '10mb', type: 'application/json' }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('EmailSender')
@@ -20,7 +27,8 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  const configService: ConfigService = app.get(ConfigService);
+  await app.listen(configService.get('PORT') || 3000);
 }
 
 bootstrap();
