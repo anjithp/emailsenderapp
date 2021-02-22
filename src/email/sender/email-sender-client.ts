@@ -6,7 +6,7 @@ import { EmailSender } from './email-sender.interface';
 import { MailjetEmailSender } from './mailjet-email-sender';
 import { SendgridEmailSender } from './send-grid-email-sender';
 
-/** client class for sending emails. maintains multiple implementations of email senders for
+/** Client class for sending emails. Maintains multiple implementations of email senders for
  * fault-tolerance
  */
 @Injectable()
@@ -27,12 +27,12 @@ export class EmailSenderClient implements OnModuleInit {
     for (let i = 0; i < this.senders.length; i++) {
       const sender = this.senders[i];
       try {
-        this.logger.debug(`trying to send email using provider ${sender.name}`);
+        this.logger.debug(`Trying to send email using provider ${sender.name}`);
         await sender.sendEmail(emailRequest);
         break;
       } catch (err) {
         this.logger.error(
-          `error occurred while sending an email using provider ${sender.name}: ${err}`,
+          `Error occurred while sending an email using provider ${sender.name}: ${err}`,
         );
         if (i === this.senders.length - 1) {
           //all senders are failing, hence throw an exception

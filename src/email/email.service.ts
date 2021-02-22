@@ -3,12 +3,11 @@ import {
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
-import * as ps from '@google-cloud/pubsub';
 import { ConfigService } from '@nestjs/config';
 import { EmailRequestDto } from './email-request.dto';
-import { Optional } from '@nestjs/common';
 import { Subscription } from '@google-cloud/pubsub';
 import { EmailSenderClient } from './sender/email-sender-client';
+import { PubsubClient } from './pubsub-client';
 
 @Injectable()
 export class EmailService {
@@ -18,20 +17,20 @@ export class EmailService {
   constructor(
     private readonly configService: ConfigService,
     private readonly esClient: EmailSenderClient,
-    @Optional()
-    private pubsub = new ps.PubSub({ projectId: process.env.GCP_PROJECT_ID }),
+    private pubsubClient: PubsubClient,
   ) {
     this.setupEmailSubscription();
   }
 
   /**
-   * persists email rquest on GCP pubsub queue. Email message will later be picked by subscription
-   * which will attempt to deliver until successful.
+   * persists email request on GCP pubsub queue. Email message will later be picked by subscription
+   * which will attempt to deliver until successful. Pubsub will guarantee delivery until the message
+   * has been acknowledged.
    * @param smDto send email input request
    */
   async saveEmail(smDto: EmailRequestDto): Promise<void> {
     try {
-      await this.pubsub
+      await this.pubsubClient.instance
         .topic(this.configService.get('GCP_PUBSUB_TOPIC_ID'))
         .publishJSON(smDto);
       //setup subscription if not done already
@@ -40,7 +39,7 @@ export class EmailService {
       }
     } catch (err) {
       this.logger.error(
-        `error occurred while publishing email to pubsub topic ${this.configService.get(
+        `Error occurred while publishing email to pubsub topic ${this.configService.get(
           'GCP_PUBSUB_TOPIC_ID',
         )}`,
       );
@@ -50,16 +49,18 @@ export class EmailService {
 
   private async setupEmailSubscription(): Promise<void> {
     try {
-      const subResp = await this.pubsub.getSubscriptions(
+      const subResp = await this.pubsubClient.instance.getSubscriptions(
         this.configService.get('GCP_PUBSUB_SUBSCRIPTION_ID'),
       );
-      this.emailListener = subResp[0][0];
-      // Receive callbacks for new messages on the subscription
-      this.emailListener.on('message', this.onEmailMessageReceived);
-      this.emailListener.on('close', this.onSubscriptionClose);
+      if (subResp) {
+        this.emailListener = subResp[0][0];
+        // Receive callbacks for new messages on the subscription
+        this.emailListener.on('message', this.onEmailMessageReceived);
+        this.emailListener.on('close', this.onSubscriptionClose);
+      }
     } catch (err) {
       this.logger.error(
-        `error occurred while setting up subscription with ID ${this.configService.get(
+        `Error occurred while setting up subscription with ID ${this.configService.get(
           'GCP_PUBSUB_SUBSCRIPTION_ID',
         )}`,
       );
@@ -70,11 +71,11 @@ export class EmailService {
     const erd = JSON.parse(message.data);
     try {
       await this.esClient.sendEmail(erd);
-      //acknowledge the message so it won't be redelivered
+      //acknowledge the message so it will be deleted from pubsub
       message.ack();
     } catch (err) {
       //just report the error and don't acknowledge the message so that it will be redeliverd again
-      this.logger.error(`error occurred while sending an email ${err}`);
+      this.logger.error(`Error occurred while sending an email ${err}`);
     }
   };
 

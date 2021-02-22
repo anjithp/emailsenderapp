@@ -8,8 +8,6 @@ import {
 
 /**
  * Handles all errors/exceptions raised in the application and returns them in a uniform format.
- * @author apaila
- * @version 1.0.0
  */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {

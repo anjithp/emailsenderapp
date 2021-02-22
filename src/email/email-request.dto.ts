@@ -9,12 +9,12 @@ export class EmailRequestDto {
   @ApiProperty()
   @IsEmail({}, { each: true })
   @IsOptional({ each: true })
-  cc: string[];
+  cc?: string[];
 
   @ApiProperty()
   @IsEmail({}, { each: true })
   @IsOptional({ each: true })
-  bcc: string[];
+  bcc?: string[];
 
   @ApiProperty()
   @IsNotEmpty()
@@ -24,5 +24,5 @@ export class EmailRequestDto {
   @ApiProperty()
   @IsString()
   @IsOptional()
-  textContent: string;
+  textContent?: string;
 }
