@@ -8,6 +8,10 @@ import { EmailRequestDto } from './email-request.dto';
 import { Subscription } from '@google-cloud/pubsub';
 import { EmailSenderClient } from './sender/email-sender-client';
 import { PubsubClient } from '../common/pubsub/pubsub-client';
+import {
+  GCP_PUBSUB_SUBSCRIPTION_ID,
+  GCP_PUBSUB_TOPIC_ID,
+} from 'src/common/pubsub/constants';
 
 @Injectable()
 export class EmailService {
@@ -31,7 +35,7 @@ export class EmailService {
   async saveEmail(smDto: EmailRequestDto): Promise<void> {
     try {
       await this.pubsubClient.instance
-        .topic(this.configService.get('GCP_PUBSUB_TOPIC_ID'))
+        .topic(this.configService.get(GCP_PUBSUB_TOPIC_ID))
         .publishJSON(smDto);
       //setup subscription if not done already
       if (!this.emailListener || !this.emailListener.isOpen) {
@@ -40,7 +44,7 @@ export class EmailService {
     } catch (err) {
       this.logger.error(
         `Error occurred while publishing email to pubsub topic ${this.configService.get(
-          'GCP_PUBSUB_TOPIC_ID',
+          GCP_PUBSUB_TOPIC_ID,
         )}`,
       );
       throw new InternalServerErrorException();
@@ -50,7 +54,7 @@ export class EmailService {
   private async setupEmailSubscription(): Promise<void> {
     try {
       const subResp = await this.pubsubClient.instance.getSubscriptions(
-        this.configService.get('GCP_PUBSUB_SUBSCRIPTION_ID'),
+        this.configService.get(GCP_PUBSUB_SUBSCRIPTION_ID),
       );
       if (subResp) {
         this.emailListener = subResp[0][0];
@@ -61,7 +65,7 @@ export class EmailService {
     } catch (err) {
       this.logger.error(
         `Error occurred while setting up subscription with ID ${this.configService.get(
-          'GCP_PUBSUB_SUBSCRIPTION_ID',
+          GCP_PUBSUB_SUBSCRIPTION_ID,
         )}`,
       );
     }
@@ -75,7 +79,9 @@ export class EmailService {
       message.ack();
     } catch (err) {
       //just report the error and don't acknowledge the message so that it will be redeliverd again
-      this.logger.error(`Error occurred while sending an email ${err}`);
+      this.logger.error(
+        `Error occurred while sending an email ${err}. Stack: ${err.stack}`,
+      );
     }
   };
 
@@ -83,7 +89,7 @@ export class EmailService {
     this.emailListener = null;
     this.logger.warn(
       `Subscription ${this.configService.get(
-        'GCP_PUBSUB_SUBSCRIPTION_ID',
+        GCP_PUBSUB_SUBSCRIPTION_ID,
       )} has been closed`,
     );
   };

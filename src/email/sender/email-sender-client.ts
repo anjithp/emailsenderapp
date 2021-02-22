@@ -32,7 +32,7 @@ export class EmailSenderClient implements OnModuleInit {
         break;
       } catch (err) {
         this.logger.error(
-          `Error occurred while sending an email using provider ${sender.name}: ${err}`,
+          `Error occurred while sending an email using provider ${sender.name}: ${err}. Stack: ${err.stack}`,
         );
         if (i === this.senders.length - 1) {
           //all senders are failing, hence throw an exception

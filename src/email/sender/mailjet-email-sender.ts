@@ -4,6 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { EmailRequestDto } from '../email-request.dto';
 import { EmailSender } from './email-sender.interface';
 
+const MAILJET_BASE_URL = 'MAILJET_BASE_URL';
+const MAILJET_API_KEY = 'MAILJET_API_KEY';
+
 /**
  * sends email using MailJet platform.
  */
@@ -42,9 +45,9 @@ export class MailjetEmailSender implements EmailSender {
       ],
     };
     await this.httpService
-      .post(`${this.configService.get('MAILJET_BASE_URL')}/send`, inputBody, {
+      .post(`${this.configService.get(MAILJET_BASE_URL)}/send`, inputBody, {
         headers: {
-          Authorization: `Basic ${this.configService.get('MAILJET_API_KEY')}`,
+          Authorization: `Basic ${this.configService.get(MAILJET_API_KEY)}`,
           'Content-Type': 'application/json',
         },
       })

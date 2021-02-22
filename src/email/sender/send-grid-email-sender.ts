@@ -3,6 +3,9 @@ import { ConfigService } from '@nestjs/config';
 import { EmailRequestDto } from '../email-request.dto';
 import { EmailSender } from './email-sender.interface';
 
+const SENDGRID_BASE_URL = 'SENDGRID_BASE_URL';
+const SENDGRID_API_KEY = 'SENDGRID_API_KEY';
+
 /**
  * sends email using SendGrid platform
  */
@@ -49,13 +52,11 @@ export class SendgridEmailSender implements EmailSender {
     };
     await this.httpService
       .post(
-        `${this.configService.get('SENDGRID_BASE_URL')}/mail/send`,
+        `${this.configService.get(SENDGRID_BASE_URL)}/mail/send`,
         inputBody,
         {
           headers: {
-            Authorization: `Bearer ${this.configService.get(
-              'SENDGRID_API_KEY',
-            )}`,
+            Authorization: `Bearer ${this.configService.get(SENDGRID_API_KEY)}`,
             'Content-Type': 'application/json',
           },
         },
