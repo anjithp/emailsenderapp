@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EmailService } from './email.service';
 import { ConfigService } from '@nestjs/config';
 import { EmailSenderClient } from './sender/email-sender-client';
-import { PubsubClient } from './pubsub-client';
+import { PubsubClient } from '../common/pubsub/pubsub-client';
 
 /** Wrote some tests to demonstrate testing approach. More tests can be added */
 describe('EmailService', () => {
@@ -36,7 +36,11 @@ describe('EmailService', () => {
         Promise.resolve([[{ on: emailListenerMock }]]),
       );
       expect(
-        await service.saveEmail({ to: ['test1@test.com'], subject: 'test' }),
+        await service.saveEmail({
+          to: ['test1@test.com'],
+          subject: 'test',
+          textContent: 'test',
+        }),
       ).toBeUndefined();
       expect(publishMock).toHaveBeenCalled();
       expect(emailListenerMock).toHaveBeenCalled();
@@ -49,7 +53,11 @@ describe('EmailService', () => {
       );
       publishMock.mockRejectedValueOnce(new Error('test error'));
       expect(
-        service.saveEmail({ to: ['test1@test.com'], subject: 'test' }),
+        service.saveEmail({
+          to: ['test1@test.com'],
+          subject: 'test',
+          textContent: 'test',
+        }),
       ).rejects.toThrow();
     });
   });

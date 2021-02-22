@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { EmailRequestDto } from './email-request.dto';
 import { Subscription } from '@google-cloud/pubsub';
 import { EmailSenderClient } from './sender/email-sender-client';
-import { PubsubClient } from './pubsub-client';
+import { PubsubClient } from '../common/pubsub/pubsub-client';
 
 @Injectable()
 export class EmailService {
