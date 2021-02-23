@@ -20,8 +20,6 @@ import { EmailService } from './email.service';
 @ApiTags('emails')
 @Controller('emails')
 export class EmailController {
-  private readonly logger = new Logger(EmailController.name);
-
   constructor(private readonly emailService: EmailService) {
     //
   }

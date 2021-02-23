@@ -34,6 +34,7 @@ export class EmailService {
    */
   async saveEmail(smDto: EmailRequestDto): Promise<void> {
     try {
+      this.logger.debug('Saving email request to pubsub');
       await this.pubsubClient.instance
         .topic(this.configService.get(GCP_PUBSUB_TOPIC_ID))
         .publishJSON(smDto);
@@ -74,6 +75,7 @@ export class EmailService {
   onEmailMessageReceived = async (message: any): Promise<void> => {
     const erd = JSON.parse(message.data);
     try {
+      this.logger.debug('Message received from pubusb');
       await this.esClient.sendEmail(erd);
       //acknowledge the message so it will be deleted from pubsub
       message.ack();

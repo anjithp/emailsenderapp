@@ -7,7 +7,11 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 
-//bootstrap the application
+/**
+ * Bootstrap the application. We can use of nodejs cluster module to
+ * take advantage of multi core systems in production but for this demo
+ * I have not used.
+ */
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -28,7 +32,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   const configService: ConfigService = app.get(ConfigService);
-  await app.listen(configService.get('PORT') || 3000);
+  await app.listen(configService.get('PORT'));
 }
 
 bootstrap();

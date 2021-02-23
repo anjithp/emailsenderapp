@@ -27,7 +27,7 @@ export class EmailSenderClient implements OnModuleInit {
     for (let i = 0; i < this.senders.length; i++) {
       const sender = this.senders[i];
       try {
-        this.logger.debug(`Trying to send email using provider ${sender.name}`);
+        this.logger.debug(`Sending email using provider ${sender.name}`);
         await sender.sendEmail(emailRequest);
         break;
       } catch (err) {
