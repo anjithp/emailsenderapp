@@ -33,6 +33,10 @@ $ npm run start
 
 Once the application is up and running you can open the Swagger UI in the browser to test the API call: http://localhost:8080/api/. If port 8080 is already taken by some other process on your machine, then you can change PORT property in .env file and restart the server(for example change port to 3000): Swagger UI URL needs to be changed accordingly.
 
+## Logging
+
+I'm using NestJS built-in logging for this demo which by defualt prints logs to console. But in production we could use something like <a href="https://github.com/winstonjs/winston">winston</a> to do custom config like printing to files, log roll-over etc.
+
 ## Test
 
 Run following command to run tests. For this demo, I've added unit tests for important classes. Integration tests
