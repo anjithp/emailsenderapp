@@ -30,7 +30,7 @@ describe('EmailController', () => {
       respMock.mockReturnValue({ send: jest.fn() });
       expect(
         await controller.handleSendEmailRequest(
-          { to: ['test1@test.com'], subject: 'test' , textContent: 'test'},
+          { to: ['test1@test.com'], subject: 'test', textContent: 'test' },
           ({ status: respMock } as unknown) as Response,
         ),
       ).toBeUndefined();
