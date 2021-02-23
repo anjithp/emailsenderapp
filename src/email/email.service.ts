@@ -11,7 +11,7 @@ import { PubsubClient } from '../common/pubsub/pubsub-client';
 import {
   GCP_PUBSUB_SUBSCRIPTION_ID,
   GCP_PUBSUB_TOPIC_ID,
-} from 'src/common/pubsub/constants';
+} from '../common/pubsub/constants';
 
 @Injectable()
 export class EmailService {
@@ -21,7 +21,7 @@ export class EmailService {
   constructor(
     private readonly configService: ConfigService,
     private readonly esClient: EmailSenderClient,
-    private pubsubClient: PubsubClient,
+    private readonly pubsubClient: PubsubClient,
   ) {
     this.setupEmailSubscription();
   }
